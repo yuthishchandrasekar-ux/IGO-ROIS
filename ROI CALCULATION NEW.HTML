@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGO Agri Techfarms ROI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        
+        :root {
+            --emerald-primary: #065f46;
+            --emerald-secondary: #059669;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f59e0b;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            scroll-behavior: smooth;
+            background-color: #f8fafc;
+            font-size: 14px;
+        }
+
+        /* --- Custom Professional Animations --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInCascade {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleAndGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(16, 185, 129, 0)); }
+            50% { transform: scale(1.01); filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.3)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(16, 185, 129, 0)); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+
+        @keyframes backgroundPan {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+
+        .animate-fade-in { animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .animate-cascade { animation: slideInCascade 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-glow { animation: scaleAndGlow 3s ease-in-out infinite; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.15s; }
+        .stagger-3 { animation-delay: 0.2s; }
+
+        .agri-bg-pattern {
+            background-image: url("https://www.transparenttextures.com/patterns/leaf.png");
+            animation: backgroundPan 100s linear infinite;
+        }
+
+        .hover-card {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
+        }
+        .hover-card:hover {
+            transform: translateY(-10px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .hover-card:hover .icon-box {
+            transform: scale(1.15) rotate(10deg);
+            background-color: white;
+        }
+
+        .icon-box { transition: all 0.4s ease-out; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #059669;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(5, 150, 105, 0.4);
+            border: 3px solid white;
+            transition: all 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+        .price-badge {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+            box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.3);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen pb-12 overflow-x-hidden">
+
+    <header class="bg-emerald-800 text-white py-12 shadow-xl border-b-4 border-emerald-900/30 relative overflow-hidden text-center">
+        <div class="absolute top-0 left-0 w-full h-full opacity-15 agri-bg-pattern"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="flex flex-col items-center gap-5">
+                <div class="bg-white p-4 rounded-3xl mb-1 inline-block shadow-2xl transition-transform duration-700 hover:rotate-[360deg] cursor-pointer">
+                    <div id="logo-fallback" class="font-black text-emerald-800 text-3xl px-8 uppercase tracking-tighter italic">IGO AGRI</div>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tight drop-shadow-2xl animate-fade-in">IGO AGRI TECHFARMS</h1>
+            </div>
+            <p class="text-emerald-50 text-opacity-80 font-medium italic text-xl md:text-2xl mt-4 animate-fade-in stagger-1">Leading High-Yield Technical Agriculture</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl transition-all duration-700" id="dashboardContent">
+        
+        <!-- Selection Controls -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-10 border border-slate-100 -mt-16 relative z-10 animate-fade-in glass-panel">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-4">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center">
+                        <i class="fas fa-seedling mr-2 text-emerald-600 text-lg animate-float"></i> Project Portfolio
+                    </label>
+                    <div class="relative group">
+                        <select id="cropSelect" class="block w-full bg-slate-50 border-2 border-slate-200 text-slate-900 py-4 px-6 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 appearance-none cursor-pointer font-bold text-xl transition-all group-hover:bg-white">
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-emerald-600">
+                            <i class="fas fa-chevron-down text-xl group-hover:translate-y-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center">
+                            <i class="fas fa-layer-group mr-2 text-emerald-600"></i> Project Scale
+                        </label>
+                        <span id="acreDisplay" class="text-2xl font-black text-emerald-700 bg-emerald-50 px-6 py-2 rounded-xl border-2 border-emerald-100 shadow-md transition-all">1 Acre</span>
+                    </div>
+                    <div class="relative px-2">
+                        <input type="range" id="acreRange" min="1" max="10" step="1" value="1" class="w-full h-2 bg-slate-200 rounded-full cursor-pointer accent-emerald-600">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 flex flex-wrap gap-4 pt-8 border-t border-slate-100">
+                <div id="unitTypeBadge" class="flex items-center text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-5 py-2.5 rounded-xl">
+                    Threshold: 5 Units
+                </div>
+                <div class="flex items-center text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700 px-5 py-2.5 rounded-xl border border-emerald-200 shadow-sm animate-glow">
+                    Risk Buffer Applied
+                </div>
+                <div id="scaleBadge" class="hidden flex items-center text-[10px] font-black text-orange-600 uppercase tracking-widest bg-orange-100 px-5 py-2.5 rounded-xl border border-orange-200">
+                    Industrial Threshold Active
+                </div>
+            </div>
+        </div>
+
+        <!-- Goat Farming Seasonal Market Prices (Dynamic Section) -->
+        <div id="goatCyclesSection" class="hidden mb-12 animate-fade-in stagger-1">
+            <h2 class="text-center font-black text-slate-400 text-[11px] uppercase tracking-[0.3em] mb-8">Seasonal Cycle & Market Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Cycle 1 -->
+                <div class="price-badge rounded-[2rem] p-8 text-white relative overflow-hidden group hover:scale-105 transition-transform">
+                    <div class="absolute -right-4 -top-4 opacity-10 group-hover:rotate-12 transition-transform duration-500">
+                        <i class="fas fa-moon text-9xl"></i>
+                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-70 mb-2">Cycle 1 (Nov - Feb)</p>
+                    <h4 class="text-2xl font-black mb-1">Ramadan Sales</h4>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-black">₹700</span>
+                        <span class="text-sm font-bold opacity-80">/ kg</span>
+                    </div>
+                    <div class="mt-4 py-2 px-4 bg-white/20 rounded-xl text-[11px] font-bold">Premium Festive Demand</div>
+                </div>
+                <!-- Cycle 2 -->
+                <div class="price-badge rounded-[2rem] p-8 text-white relative overflow-hidden group hover:scale-105 transition-transform">
+                    <div class="absolute -right-4 -top-4 opacity-10 group-hover:rotate-12 transition-transform duration-500">
+                        <i class="fas fa-kaaba text-9xl"></i>
+                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-70 mb-2">Cycle 2 (Mar - Jun)</p>
+                    <h4 class="text-2xl font-black mb-1">Bakrid Sales</h4>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-black">₹700</span>
+                        <span class="text-sm font-bold opacity-80">/ kg</span>
+                    </div>
+                    <div class="mt-4 py-2 px-4 bg-white/20 rounded-xl text-[11px] font-bold">Peak Seasonal Returns</div>
+                </div>
+                <!-- Cycle 3 -->
+                <div class="bg-white rounded-[2rem] p-8 border-2 border-slate-100 relative overflow-hidden group hover:scale-105 transition-transform shadow-lg">
+                    <div class="absolute -right-4 -top-4 opacity-5 group-hover:rotate-12 transition-transform duration-500">
+                        <i class="fas fa-balance-scale text-9xl"></i>
+                    </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Cycle 3 (Jul - Oct)</p>
+                    <h4 class="text-2xl font-black text-slate-800 mb-1">Normal Sales</h4>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-4xl font-black text-emerald-600">₹450</span>
+                        <span class="text-sm font-bold text-slate-400">/ kg</span>
+                    </div>
+                    <div class="mt-4 py-2 px-4 bg-slate-100 rounded-xl text-[11px] font-bold text-slate-600">Standard Market Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Totals -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <!-- Capital Cost -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-8 border-blue-500 flex flex-col items-center text-center hover-card animate-fade-in stagger-1">
+                <div class="icon-box w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                    <i class="fas fa-coins text-blue-500 text-3xl"></i>
+                </div>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Capital Cost</p>
+                <h3 id="statCapital" class="text-3xl font-black text-slate-800 tabular-nums">₹ 0</h3>
+                <p class="text-[9px] text-slate-400 mt-4 font-bold uppercase tracking-widest">Initial Investment</p>
+            </div>
+            
+            <!-- Running Cost -->
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-8 border-orange-500 flex flex-col items-center text-center hover-card animate-fade-in stagger-2">
+                <div class="icon-box w-20 h-20 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                    <i class="fas fa-chart-line text-orange-500 text-3xl"></i>
+                </div>
+                <p id="statRunningLabel" class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Running Cost (Y1)</p>
+                <h3 id="statRunning" class="text-3xl font-black text-slate-800 tabular-nums">₹ 0</h3>
+                <p class="text-[9px] text-slate-400 mt-4 font-bold uppercase tracking-widest">Operations OPEX</p>
+            </div>
+
+            <!-- Net Profit -->
+            <div class="bg-emerald-700 p-8 rounded-[2.5rem] shadow-2xl border-b-8 border-emerald-900 flex flex-col items-center text-center text-white hover-card animate-glow animate-fade-in stagger-3">
+                <div class="icon-box w-20 h-20 bg-emerald-600/50 rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-white/10">
+                    <i class="fas fa-hand-holding-dollar text-white text-3xl"></i>
+                </div>
+                <p id="statProfitLabel" class="text-emerald-100 text-[10px] font-black uppercase tracking-widest mb-1">Net Profit (Y1)</p>
+                <h3 id="statProfit" class="text-4xl font-black tabular-nums">₹ 0</h3>
+                <div id="statMargin" class="mt-4 bg-white/20 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                    ROI Estimate: 0%
+                </div>
+                <p id="statDisclaimer" class="text-[9px] text-white text-opacity-50 mt-4 font-bold uppercase tracking-widest">(Post Buffer)</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-5 space-y-10">
+                <!-- Technical specs -->
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 animate-fade-in">
+                    <div class="bg-slate-800 text-white px-8 py-5 flex items-center">
+                        <i class="fas fa-microscope mr-3 text-emerald-400 text-xl animate-float"></i>
+                        <h3 class="font-black text-[11px] uppercase tracking-widest">Technical Parameters</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <tbody id="techSpecBody" class="divide-y divide-slate-50 text-[13px]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Asset Valuation -->
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 animate-fade-in">
+                    <div class="bg-emerald-900 text-white px-8 py-5">
+                        <h3 class="font-black text-[11px] uppercase tracking-widest flex items-center">
+                            <i class="fas fa-toolbox mr-3 text-orange-400 text-xl"></i> Setup Valuation
+                        </h3>
+                    </div>
+                    <div class="p-10 text-center">
+                        <div class="text-slate-400 text-[9px] font-black uppercase tracking-widest mb-2">Aggregate Value</div>
+                        <div id="capitalValueDetailed" class="text-4xl font-black text-slate-800 tracking-tighter tabular-nums mb-8">₹ 0</div>
+                        <div id="capitalComponents" class="p-6 bg-slate-50 rounded-2xl text-[11px] text-slate-600 font-bold leading-relaxed border-2 border-dashed border-slate-200 text-left">
+                            Verified project assets including land preparation and site engineering.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Breakdown -->
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 h-full animate-fade-in">
+                    <div class="bg-slate-700 text-white px-8 py-5 flex justify-between items-center">
+                        <h3 class="font-black text-[11px] uppercase tracking-widest flex items-center">
+                            <i class="fas fa-receipt mr-3 text-orange-400 text-xl"></i> Fiscal Performance (Annual)
+                        </h3>
+                    </div>
+                    
+                    <div id="runningList" class="p-8 space-y-4"></div>
+                    
+                    <div class="bg-slate-50 px-10 py-10 border-t border-slate-100 space-y-6">
+                        <div class="flex justify-between items-center text-slate-500">
+                            <span class="text-[12px] font-black uppercase tracking-widest">Potential Revenue (Annual)</span>
+                            <span id="grossIncomeSummary" class="font-black text-2xl text-slate-800 tabular-nums">₹ 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-500">
+                            <span class="text-[12px] font-black uppercase tracking-widest">Running Cost (Annual)</span>
+                            <span id="runningTotalSummary" class="font-black text-2xl text-slate-800 tabular-nums">₹ 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-blue-600 pt-4 border-t border-slate-200">
+                            <span class="text-[12px] font-black uppercase tracking-widest">Net Profit (Pre-Buffer)</span>
+                            <span id="netProfitRawSummary" class="font-black text-2xl tabular-nums">₹ 0</span>
+                        </div>
+                        <div class="flex justify-between items-center text-red-500">
+                            <span class="text-[12px] font-black uppercase tracking-widest flex items-center">
+                                Risk Buffer (<span id="toleranceSummaryLabel">20%</span>)
+                            </span>
+                            <span id="toleranceSummary" class="font-black text-xl tabular-nums">- ₹ 0</span>
+                        </div>
+                        <div class="pt-8 flex justify-between items-center border-t-2 border-slate-200">
+                            <span class="text-sm font-black text-emerald-700 uppercase tracking-widest">Guaranteed Return (Annual)</span>
+                            <span id="netProfitSummary" class="font-black text-emerald-700 text-4xl tracking-tighter tabular-nums">₹ 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Year Strategic Lifecycle / Cycle Wise Breakdown -->
+        <div id="multiYearSection" class="hidden bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 mt-12">
+            <div class="bg-blue-900 text-white px-10 py-8 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center">
+                    <i class="fas fa-calendar-check mr-5 text-3xl text-blue-300 animate-float"></i>
+                    <h3 id="lifecycleTitle" class="font-black text-lg uppercase tracking-[0.2em]">Project Strategic Lifecycle</h3>
+                </div>
+                <div class="bg-white/10 px-8 py-5 rounded-[2rem] border border-white/20 text-center md:text-right shadow-2xl backdrop-blur-md">
+                    <p id="lifecycleProfitLabel" class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Total Lifecycle Profit</p>
+                    <h4 id="lifecycleProfit" class="text-3xl font-black text-emerald-300 tabular-nums">₹ 0</h4>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 border-b-2 border-slate-100">
+                        <tr>
+                            <th id="lifecycleTableCol1" class="px-10 py-5 font-black text-slate-400 uppercase tracking-widest">Fiscal Year</th>
+                            <th class="px-10 py-5 font-black text-slate-400 uppercase tracking-widest text-right">Potential Revenue</th>
+                            <th class="px-10 py-5 font-black text-slate-400 uppercase tracking-widest text-right">Running Cost</th>
+                            <th class="px-10 py-5 font-black text-slate-400 uppercase tracking-widest text-right">Net Profit</th>
+                            <th class="px-10 py-5 font-black text-emerald-800 uppercase tracking-widest text-right bg-emerald-50/50">Return</th>
+                        </tr>
+                    </thead>
+                    <tbody id="multiYearBody" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const current = Math.floor(ease * (end - start) + start);
+                obj.innerText = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(current);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function formatINR(val) {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
+        }
+
+        const iconMap = { "Manures": "fa-flask-vial", "Labour": "fa-users-gear", "Electricity": "fa-bolt-lightning", "AMC": "fa-handshake-angle", "Farm Manager": "fa-user-tie", "Purchase": "fa-cart-shopping", "Growing": "fa-up-right-from-square" };
+
+        const cropData = {
+            mushroom_indoor: {
+                name: "Mushroom (Indoor)", unit: "sq ft", multiplierBase: 1000, income: 2349000, capital: 1180000, tolerance: 10,
+                tech: {
+                    "Structure": "Indoor Climate Control", "Base Area": "1,000 Sq.ft", "Duration": "55 Days",
+                    "Variety": "Oyster (P.florida)", "Bags": "1,450 per cycle", "Yield/Bag": "1.5 Kg",
+                    "Contamination": "10% Risk Buffer", "Market Price": "₹200 / Kg (Max)"
+                },
+                runningItems: [
+                    { name: "Cultivation Exp.", cost: 1044000, icon: "Growing", type: "per-acre" },
+                    { name: "Bag Cost", cost: 20000, icon: "Purchase", type: "per-acre" },
+                    { name: "Maintenance", cost: 120000, icon: "Manures", type: "per-acre" },
+                    { name: "Cost of Labour", cost: 75000, icon: "Labour", type: "per-acre" },
+                    { name: "Electricity", cost: 120000, icon: "Electricity", type: "per-acre" },
+                    { name: "AMC", cost: 120000, icon: "AMC", type: "per-acre" },
+                    { name: "Farm Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }
+                ]
+            },
+            mushroom_outdoor: {
+                name: "Mushroom (Outdoor)", unit: "sq ft", multiplierBase: 1000, income: 2349000, capital: 1416000, tolerance: 10,
+                tech: {
+                    "Structure": "Outdoor Natural Vent", "Base Area": "1,000 Sq.ft", "Duration": "55 Days",
+                    "Variety": "Oyster (P.florida)", "Bags": "1,450 per cycle", "Yield/Bag": "1.5 Kg",
+                    "Contamination": "10% Risk Buffer", "Market Price": "₹200 / Kg (Max)"
+                },
+                runningItems: [
+                    { name: "Cultivation Exp.", cost: 1044000, icon: "Growing", type: "per-acre" },
+                    { name: "Bag Cost", cost: 20000, icon: "Purchase", type: "per-acre" },
+                    { name: "Maintenance", cost: 120000, icon: "Manures", type: "per-acre" },
+                    { name: "Cost of Labour", cost: 75000, icon: "Labour", type: "per-acre" },
+                    { name: "Electricity", cost: 120000, icon: "Electricity", type: "per-acre" },
+                    { name: "AMC", cost: 120000, icon: "AMC", type: "per-acre" },
+                    { name: "Farm Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }
+                ]
+            },
+            microgreens: {
+                name: "Microgreens", unit: "sq ft", multiplierBase: 100, income: 1440000, capital: 383918, tolerance: 30,
+                tech: {
+                    "Area": "200 Sq.ft (Base)", "Duration": "15 Days", "Racks": "10 per 200 sq.ft",
+                    "Trays": "200 per 200 sq.ft", "Yield/Tray": "150-200g", "Market Price": "₹2,000 / Kg",
+                    "Cycles": "20 Cycles / Year"
+                },
+                runningItems: [
+                    { name: "Grow Media", cost: 300000, icon: "Manures", type: "per-acre" },
+                    { name: "Seed Cost", cost: 120000, icon: "Purchase", type: "per-acre" },
+                    { name: "Cost of Labour", cost: 70800, icon: "Labour", type: "per-acre" },
+                    { name: "Electricity/Misc", cost: 59200, icon: "Electricity", type: "per-acre" },
+                    { name: "AMC", cost: 120000, icon: "AMC", type: "per-acre" },
+                    { name: "Farm Manager", cost: 144000, icon: "Farm Manager", type: "fixed-block" }
+                ]
+            },
+            chrysanthemum: { 
+                name: "Chrysanthemum", income: 2047500, capital: 649306, tolerance: 30, 
+                tech: { 
+                    "Variety": "Spray Type", "Crop Duration": "4 Months", "Planting Season": "June - July",
+                    "No. of Plants": "81,900 Plants", "Spacing": "15x15 cm (P2P), 1m (Bed Width), 50cm (B2B)",
+                    "Harvest Start": "Starts from 4th Month", "Price": "Rs. 250 / bunch (10 stems)", "Yield/Acre": "8,190 stems"
+                }, 
+                runningItems: [{ name: "Manures & Fert", cost: 79572, icon: "Manures", type: "per-acre" }, { name: "Skilled Labour", cost: 32000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 35000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Farm Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            ginger: { 
+                name: "Ginger (Polyhouse)", income: 1918400, capital: 400000, tolerance: 30, 
+                tech: { 
+                    "Variety": "IISR Vajra", "Crop Duration": "9 Months", "Planting Season": "Jan - Feb",
+                    "No. of Plants": "29,980 Plants", "Spacing": "45cm (Row) x 30cm (Plant)", "Yield/Plant": "800-1000g",
+                    "Total Cycle Yield": "23,980 kg / Acre", "Market Price": "Rs. 70 - 90 / kg"
+                }, 
+                runningItems: [{ name: "Soil Nutrients", cost: 47506, icon: "Manures", type: "per-acre" }, { name: "Labour Cost", cost: 68000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 34000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Site Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            papaya: {
+                name: "Papaya (Red Lady)", income: 787500, capital: 344795, tolerance: 30,
+                tech: { 
+                    "Variety": "Red Lady", "Crop Duration": "2 Years", "No. of Plants": "900 / Acre",
+                    "Spacing": "6 x 6 Feet", "First Harvest": "8th Month", "Yield per Plant": "85 kg (Total)",
+                    "Year 1 Yield": "35 kg / Plant", "Year 2 Yield": "50 kg / Plant", "Market Price": "Rs. 25 / kg"
+                },
+                yearWise: [{ year: "Year 1", income: 787500, running: 312000 }, { year: "Year 2", income: 1125000, running: 312000 }],
+                runningItems: [{ name: "Manures & Pests", cost: 65000, icon: "Manures", type: "per-acre" }, { name: "Skilled Labour", cost: 42000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 25000, icon: "Electricity", type: "per-acre" }, { name: "Annual AMC", cost: 60000, icon: "AMC", type: "per-acre" }, { name: "Farm Manager", cost: 120000, icon: "Farm Manager", type: "per-acre" }]
+            },
+            muskmelon: {
+                name: "Muskmelon", income: 1209600, capital: 350719,
+                tech: { 
+                    "Variety": "Arka Siri", "Crop Duration": "75 Days (Per Cycle)", "Cycles": "3 per Year",
+                    "No. of Plants": "~4,500 Plants", "Spacing": "6 ft (Row) x 1.6 ft (Plant)", "Yield": "2.8 kg / Plant",
+                    "Total Annual Yield": "12,600 kg", "Market Price": "Rs. 32 / kg"
+                },
+                runningItems: [{ name: "Inputs Cost", cost: 102000, icon: "Manures", type: "per-acre" }, { name: "Manual Labour", cost: 65000, icon: "Labour", type: "per-acre" }, { name: "Grid Power", cost: 22000, icon: "Electricity", type: "per-acre" }, { name: "AMC Service", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Site Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }]
+            },
+            turkeyberry: { 
+                name: "Turkey Berry", income: 1020000, capital: 262196, 
+                tech: { 
+                    "Variety": "Thai Egg Plant", "Crop Duration": "3-5 Years", "No. of Plants": "1,700 Plants",
+                    "Spacing": "5 x 5 Feet", "First Harvest": "8 Months", "Yield per Plant": "Y1: 4kg | Y2: 8kg",
+                    "Total Cycle Yield": "20,400 kg / Acre", "Market Price": "Rs. 150 / kg"
+                }, 
+                yearWise: [{ year: "Year 1", income: 1020000, running: 534000 }, { year: "Year 2", income: 2040000, running: 549000 }, { year: "Year 3", income: 2040000, running: 549000 }],
+                runningItems: [{ name: "Organic Inputs", cost: 68000, icon: "Manures", type: "per-acre" }, { name: "Labour", cost: 96000, icon: "Labour", type: "per-acre" }, { name: "Power", cost: 10000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            dragonfruit: {
+                name: "Dragon Fruit", income: 1200000, capital: 1468554,
+                tech: { 
+                    "Variety": "Syam Red C", "Crop Duration": "10 Years", "No. of Pillars": "500 (with rings)",
+                    "No. of Plants": "2000 (4 per pillar)", "Spacing": "12 x 8 Feet", "First Harvest": "14-18 Months",
+                    "Yield per Pole": "Y2: 16kg | Y3: 20kg | Y4+: 32kg", "Market Price": "Rs. 150 / kg"
+                },
+                yearWise: [{ year: "Year 2", income: 1200000, running: 478850 }, { year: "Year 3", income: 1500000, running: 497850 }, { year: "Year 4+", income: 2400000, running: 491850 }],
+                runningItems: [{ name: "Manures & Pests", cost: 31850, icon: "Manures", type: "per-acre" }, { name: "Skilled Labour", cost: 32000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 30000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Farm Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }]
+            },
+            moringa: { 
+                name: "Moringa", income: 1101600, capital: 344774, 
+                tech: { 
+                    "Variety": "PKM 1", "Crop Duration": "3 Years", "No. of Plants": "612 Plants",
+                    "Spacing": "2.5m x 2.5m (Pit: 45x45x45 cm)", "First Harvest": "6th Month", "Yield": "~200 Pods/Yr",
+                    "Total Annual Yield": "18,360 kg / Acre", "Market Price": "Rs. 60 / kg"
+                }, 
+                yearWise: [{ year: "Year 1", income: 1101600, running: 522408 }, { year: "Year 2", income: 1101600, running: 548969 }],
+                runningItems: [{ name: "Inputs", cost: 79608, icon: "Manures", type: "per-acre" }, { name: "Labour Cost", cost: 52800, icon: "Labour", type: "per-acre" }, { name: "Grid Power", cost: 30000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            chilli: { 
+                name: "Chilly (Polyhouse)", income: 2123550, capital: 578281, tolerance: 30, 
+                tech: { 
+                    "Variety": "G4 (Bagyalaxmi)", "Crop Duration": "120 Days (Cycle)", "No. of Plants": "14,300 Plants",
+                    "Spacing": "60 cm (Row) x 45 cm (Plant)", "First Harvest": "90 Days (DAT)", "Yield": "0.8-1kg / plant",
+                    "Total Annual Yield": "38,610 kg (3 Cycles)", "Price": "Rs. 50-60 / kg"
+                }, 
+                runningItems: [{ name: "Pest Mgmt", cost: 78000, icon: "Manures", type: "per-acre" }, { name: "Labour Cost", cost: 48000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 33000, icon: "Electricity", type: "per-acre" }, { name: "AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            tapioca: { 
+                name: "Tapioca", income: 1876000, capital: 339368, 
+                tech: { 
+                    "Variety": "Vellai Bondha", "Crop Duration": "11 Months", "Season": "Jan-Feb / May-Jun",
+                    "No. of Plants": "13,400 Plants", "Spacing": "75cm x 75cm (Paired row)", "Yield/Plant": "4.0 kg",
+                    "Total Yield": "53,600 kg / Acre", "Market Price": "Rs. 35 / kg"
+                }, 
+                runningItems: [{ name: "Soil Nutrients", cost: 75310, icon: "Manures", type: "per-acre" }, { name: "Labour Cost", cost: 68900, icon: "Labour", type: "per-acre" }, { name: "Power Grid", cost: 22000, icon: "Electricity", type: "per-acre" }, { name: "Annual AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Site Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            watermelon: { 
+                name: "Watermelon", income: 1036800, capital: 350719, 
+                tech: { 
+                    "Variety": "Arka Aishwarya (F1)", "Crop Duration": "100 Days", "Season": "Year-round (South)",
+                    "No. of Plants": "3,456 Plants", "Spacing": "180cm (Bed) x 60cm (Plant)", "Yield/Plant": "10 kg",
+                    "Annual Total Yield": "69,120 kg (2 Cycles)", "Price": "Rs. 15 / kg"
+                }, 
+                runningItems: [{ name: "Inputs Cost", cost: 104000, icon: "Manures", type: "per-acre" }, { name: "Labour", cost: 50000, icon: "Labour", type: "per-acre" }, { name: "Utilities", cost: 10000, icon: "Electricity", type: "per-acre" }, { name: "Standard AMC", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Operational Lead", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            garlic: { 
+                name: "Garlic", income: 780000, capital: 396228, 
+                tech: { 
+                    "Variety": "Yamuna Safed / Ooty 1", "Crop Duration": "4 Months", "Season": "June-Nov",
+                    "No. of Plants": "2,60,000 Plants", "Spacing": "15x10 cm", "Yield/Plant": "25 g",
+                    "Total Annual Yield": "6,500 kg / Acre", "Price": "Rs. 120 / kg"
+                }, 
+                runningItems: [{ name: "Manures", cost: 80600, icon: "Manures", type: "per-acre" }, { name: "Manual Labour", cost: 56000, icon: "Labour", type: "per-acre" }, { name: "Electricity", cost: 10000, icon: "Electricity", type: "per-acre" }, { name: "AMC Service", cost: 120000, icon: "AMC", type: "fixed-block" }, { name: "Farm Manager", cost: 240000, icon: "Farm Manager", type: "fixed-block" }] 
+            },
+            goat: { 
+                name: "Goat Farming", unit: "Unit", multiplierBase: 1, income: 7400000, capital: 1757800, tolerance: 10,
+                tech: {
+                    "Shed Area": "2,200 sq ft per unit",
+                    "Herd Size": "100 Goats per unit",
+                    "Initial Weight": "20 kg per kid",
+                    "Cycle Period": "4 Months (3/Yr)",
+                    "Ramadan Price": "₹700 / kg",
+                    "Bakrid Price": "₹700 / kg",
+                    "Normal Price": "₹450 / kg"
+                },
+                yearWise: [
+                    { year: "Cycle 1 (Ramadan)", income: 2850000, running: 1500000 },
+                    { year: "Cycle 2 (Bakrid)", income: 2850000, running: 1500000 },
+                    { year: "Cycle 3 (Normal)", income: 1700000, running: 1500000 }
+                ],
+                runningItems: [
+                    { name: "Annual Goat Purchase", cost: 2400000, icon: "Purchase", type: "per-acre" },
+                    { name: "Annual Growing/Feed", cost: 1560000, icon: "Growing", type: "per-acre" },
+                    { name: "Annual AMC Cost", cost: 360000, icon: "AMC", type: "fixed-block" },
+                    { name: "Annual Labour Charges", cost: 180000, icon: "Labour", type: "per-acre" }
+                ]
+            }
+        };
+
+        const cropSelect = document.getElementById('cropSelect');
+        const acreRange = document.getElementById('acreRange');
+        const acreDisplay = document.getElementById('acreDisplay');
+        const techSpecBody = document.getElementById('techSpecBody');
+        const multiYearSection = document.getElementById('multiYearSection');
+        const multiYearBody = document.getElementById('multiYearBody');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const goatCyclesSection = document.getElementById('goatCyclesSection');
+
+        Object.keys(cropData).forEach(key => {
+            const opt = document.createElement('option');
+            opt.value = key; opt.textContent = cropData[key].name; cropSelect.appendChild(opt);
+        });
+
+        let currentStats = { capital: 0, running: 0, profit: 0, rawProfit: 0, gross: 0, tol: 0, lifecycle: 0 };
+
+        function updateUI() {
+            const key = cropSelect.value; 
+            const multiplier = parseInt(acreRange.value); 
+            const data = cropData[key];
+            const isScaleUp = multiplier > 5;
+            
+            // Goat Cycle Visibility
+            goatCyclesSection.classList.toggle('hidden', key !== 'goat');
+
+            // Unit Logic
+            const unitType = data.unit || "Acre";
+            const scaleBase = data.multiplierBase || 1;
+            const displayScale = multiplier * scaleBase;
+            
+            document.getElementById('scaleBadge').classList.toggle('hidden', !isScaleUp || key === 'watermelon');
+            
+            // Update Threshold Label
+            const unitTypeBadge = document.getElementById('unitTypeBadge');
+            if (unitType === 'Unit') {
+                unitTypeBadge.textContent = `Threshold: 5 Units (500 Goats)`;
+                acreDisplay.textContent = `${displayScale} Unit${displayScale > 1 ? 's' : ''} (${displayScale * 100} Goats)`;
+            } else {
+                unitTypeBadge.textContent = `Threshold: 5 Acres`;
+                acreDisplay.textContent = `${displayScale.toLocaleString()} ${unitType}${displayScale > 1 && unitType !== "sq ft" ? 's' : ''}`;
+            }
+
+            const tolPercent = data.tolerance || 20;
+            const tolMultiplier = tolPercent / 100;
+            document.getElementById('toleranceSummaryLabel').textContent = `${tolPercent}%`;
+
+            // Tech Specs Cascade
+            techSpecBody.innerHTML = '';
+            Object.entries(data.tech).forEach(([label, value], idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'animate-cascade';
+                tr.style.animationDelay = `${idx * 0.05}s`;
+                tr.innerHTML = `<td class="px-6 py-3 font-black text-slate-400 uppercase text-[9px] tracking-widest">${label}</td><td class="px-6 py-3 font-bold text-slate-800">${value}</td>`;
+                techSpecBody.appendChild(tr);
+            });
+
+            // Running Items Cascade
+            let totalRunningAnnual = 0; 
+            const runList = document.getElementById('runningList'); 
+            runList.innerHTML = '';
+            data.runningItems.forEach((item, idx) => {
+                let itemTotal = (item.type === "fixed-block") 
+                    ? (key === 'watermelon' ? item.cost * Math.ceil(multiplier / 2) : (isScaleUp ? item.cost * 1.8 : item.cost)) 
+                    : item.cost * multiplier;
+                
+                totalRunningAnnual += itemTotal;
+                runList.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100 animate-fade-in hover:bg-white hover:shadow-lg transition-all" style="animation-delay: ${idx * 0.08}s"><div class="flex items-center"><div class="icon-box w-10 h-10 bg-white rounded-xl flex items-center justify-center mr-5 shadow-sm text-lg"><i class="fas ${iconMap[item.icon] || 'fa-seedling'} text-orange-500"></i></div><span class="text-xs font-black text-slate-800 uppercase tracking-tight">${item.name}</span></div><span class="font-black text-slate-800 tabular-nums">${formatINR(itemTotal)}</span></div>`;
+            });
+
+            const totalCapital = data.capital * multiplier; 
+            const incomeAnnual = data.income * multiplier;
+            
+            const rawProfitAnnual = incomeAnnual - totalRunningAnnual;
+            const toleranceAmountAnnual = rawProfitAnnual * tolMultiplier;
+            let netProfitAnnual = rawProfitAnnual - toleranceAmountAnnual;
+
+            // --- Profit Label UI ---
+            document.getElementById('statProfitLabel').textContent = key === 'goat' ? "Net Annual Profit" : "Net Profit (Y1)";
+            
+            animateValue('statCapital', currentStats.capital, totalCapital, 800);
+            animateValue('capitalValueDetailed', currentStats.capital, totalCapital, 800);
+            animateValue('statRunning', currentStats.running, totalRunningAnnual, 800);
+            animateValue('statProfit', currentStats.profit, netProfitAnnual, 1000);
+            animateValue('grossIncomeSummary', currentStats.gross, incomeAnnual, 800);
+            animateValue('runningTotalSummary', currentStats.running, totalRunningAnnual, 800);
+            animateValue('netProfitRawSummary', currentStats.rawProfit, rawProfitAnnual, 800);
+            animateValue('toleranceSummary', currentStats.tol, toleranceAmountAnnual, 800);
+            animateValue('netProfitSummary', currentStats.profit, netProfitAnnual, 1000);
+
+            // Lifecycle / Cycle Table Logic
+            if (data.yearWise) {
+                multiYearSection.classList.remove('hidden');
+                multiYearBody.innerHTML = '';
+                
+                // Dynamic Headers
+                document.getElementById('lifecycleTitle').textContent = key === 'goat' ? "Seasonal Market Lifecycle" : "Project Strategic Lifecycle";
+                document.getElementById('lifecycleProfitLabel').textContent = key === 'goat' ? "Net Annual Returns" : "Total Lifecycle Profit";
+                document.getElementById('lifecycleTableCol1').textContent = key === 'goat' ? "Market Cycle" : "Fiscal Year";
+
+                let cumulativeSafeTotal = 0;
+                const fBase = data.runningItems.filter(i => i.type === 'fixed-block').reduce((a, b) => a + b.cost, 0);
+                const scaledFBase = (key === 'watermelon' ? (fBase * Math.ceil(multiplier / 2)) : (isScaleUp ? fBase * 1.8 : fBase));
+
+                data.yearWise.forEach((y, idx) => {
+                    const yRev = y.income * multiplier;
+                    // Proportional running cost for cycles
+                    const yExp = key === 'goat' ? (totalRunningAnnual / 3) : (((y.running - fBase) * multiplier) + scaledFBase);
+                    
+                    let yTol = (key === 'turkeyberry' && idx >= 1) ? 30 : tolPercent;
+                    const ySafe = (yRev - yExp) * (1 - (yTol / 100));
+                    cumulativeSafeTotal += ySafe;
+                    
+                    multiYearBody.innerHTML += `
+                        <tr class="animate-cascade" style="animation-delay: ${idx * 0.1}s">
+                            <td class="px-10 py-5 font-black text-slate-700">${y.year}</td>
+                            <td class="px-10 py-5 font-black text-blue-600 text-right tabular-nums">${formatINR(yRev)}</td>
+                            <td class="px-10 py-5 font-bold text-orange-600 text-right tabular-nums">${formatINR(yExp)}</td>
+                            <td class="px-10 py-5 font-bold text-slate-800 text-right tabular-nums">${formatINR(yRev - yExp)}</td>
+                            <td class="px-10 py-5 font-black text-emerald-700 text-right text-base bg-emerald-50/40 tabular-nums">${formatINR(ySafe)}</td>
+                        </tr>`;
+                });
+                animateValue('lifecycleProfit', currentStats.lifecycle, cumulativeSafeTotal, 1200);
+                currentStats.lifecycle = cumulativeSafeTotal;
+            } else { 
+                multiYearSection.classList.add('hidden'); 
+            }
+
+            currentStats = { 
+                capital: totalCapital, 
+                running: totalRunningAnnual, 
+                profit: netProfitAnnual, 
+                rawProfit: rawProfitAnnual, 
+                gross: incomeAnnual, 
+                tol: toleranceAmountAnnual, 
+                lifecycle: currentStats.lifecycle 
+            };
+            
+            const roiPercent = totalRunningAnnual > 0 ? ((netProfitAnnual / totalRunningAnnual) * 100).toFixed(1) : 0;
+            document.getElementById('statMargin').innerHTML = `ROI Estimate: ${roiPercent}%`;
+        }
+
+        cropSelect.addEventListener('change', () => {
+            dashboardContent.style.opacity = '0';
+            dashboardContent.style.transform = 'translateY(20px)';
+            setTimeout(() => { updateUI(); dashboardContent.style.opacity = '1'; dashboardContent.style.transform = 'translateY(0)'; }, 400);
+        });
+
+        acreRange.addEventListener('input', updateUI);
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
